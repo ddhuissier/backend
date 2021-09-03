@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +18,8 @@ using OthersAPI.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebApi.Repositories;
 
@@ -35,6 +39,7 @@ namespace OthersAPI
         {
             BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
             BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
+
             services.AddAuthentication("Bearer")
               .AddJwtBearer("Bearer", config => {
                   config.Authority = "http://localhost:5000/";
@@ -50,16 +55,21 @@ namespace OthersAPI
                        .AllowAnyHeader()));
 
             services.AddControllers();
+            var mongoDBSettings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
             services.AddSingleton<IMongoClient>(serviveProvider =>
             {
-                var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
-                return new MongoClient(settings.ConnectionString);
+                
+                return new MongoClient(mongoDBSettings.ConnectionString);
             });
             services.AddSingleton<IWeatherPrefRepository, WeatherPreferenceMongoDbRepository>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OthersAPI", Version = "v1" });
             });
+
+            services.AddHealthChecks()
+                .AddMongoDb(mongoDBSettings.ConnectionString, name:"mongodb",
+                timeout: TimeSpan.FromSeconds(3), tags: new[] { "ready" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +95,29 @@ namespace OthersAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions()
+                {
+                    Predicate = (chk) => chk.Tags.Contains("ready"),
+                    ResponseWriter = async(context, report) =>
+                    {
+                        var result = JsonSerializer.Serialize(
+                            new
+                            {
+                                status = report.Status.ToString(),
+                                checks = report.Entries.Select(e => new { 
+                                    name = e.Key,
+                                    status = e.Value.Status.ToString(),
+                                    exception = e.Value.Exception != null ? e.Value.Exception.Message : "none",
+                                    duration = e.Value.Duration.ToString()
+                                })
+
+                            }
+                         );
+
+                        context.Response.ContentType = MediaTypeNames.Application.Json;
+                        await context.Response.WriteAsync(result);
+                    } 
+                });
             });
         }
     }
