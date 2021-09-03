@@ -83,8 +83,11 @@ namespace OthersAPI
             }
 
             app.UseCors("JustGet");
-
-            //app.UseHttpsRedirection();
+            if (env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
+           
 
             app.UseRouting();
 
