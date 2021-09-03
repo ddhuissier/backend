@@ -7,10 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
+using OthersAPI.Reporitories;
+using OthersAPI.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApi.Repositories;
 
 namespace OthersAPI
 {
@@ -26,6 +33,8 @@ namespace OthersAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
             services.AddAuthentication("Bearer")
               .AddJwtBearer("Bearer", config => {
                   config.Authority = "http://localhost:5000/";
@@ -41,6 +50,12 @@ namespace OthersAPI
                        .AllowAnyHeader()));
 
             services.AddControllers();
+            services.AddSingleton<IMongoClient>(serviveProvider =>
+            {
+                var settings = Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+                return new MongoClient(settings.ConnectionString);
+            });
+            services.AddSingleton<IWeatherPrefRepository, WeatherPreferenceMongoDbRepository>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OthersAPI", Version = "v1" });
