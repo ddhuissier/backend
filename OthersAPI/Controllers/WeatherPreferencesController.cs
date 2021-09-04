@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OthersAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -15,16 +16,23 @@ namespace OthersAPI.Controllers
     public class WeatherPreferencesController : ControllerBase
     {
         private readonly IWeatherPrefRepository repo;
+        private readonly ILogger<WeatherPreferencesController> logger; 
 
-        public WeatherPreferencesController(IWeatherPrefRepository repo)
+        public WeatherPreferencesController(
+            IWeatherPrefRepository repo,
+            ILogger<WeatherPreferencesController> logger
+        )
         {
             this.repo = repo;
+            this.logger = logger;
         }
         // GET: api/<WeatherPreferencesController>
         [HttpGet]
         public IEnumerable<WeatherPreference> Get() 
-        {
-            return repo.Get();
+        { 
+            var items =repo.Get();
+            logger.LogInformation($"Get WeatherPreferences: {DateTime.Now.ToString("hh:mm:ss")}: items Count: {items.Count()} ");
+            return items;
          }
 
         // GET api/<WeatherPreferencesController>/5
