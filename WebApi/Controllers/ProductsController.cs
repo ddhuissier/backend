@@ -36,22 +36,22 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Product>>PostProducts([FromBody] Product Product)
+        public async Task<ActionResult<Product>>PostProducts([FromBody] Product product)
         {
-            var newProduct = await _productRepository.Create(Product);
+            var newProduct = await _productRepository.Create(product);
             return CreatedAtAction(nameof(GetProducts), new { id = newProduct.Id }, newProduct);
         }
 
         [HttpPut]
         [Authorize]
-        public async Task<ActionResult> PutProducts(int id, [FromBody] Product Product)
+        public async Task<ActionResult> PutProducts(int id, [FromBody] Product product)
         {
-            if(id != Product.Id)
+            if(id != product.Id)
             {
                 return BadRequest();
             }
 
-            await _productRepository.Update(Product);
+            await _productRepository.Update(product);
 
             return NoContent();
         }

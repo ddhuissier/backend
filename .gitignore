@@ -6,3 +6,5 @@
 /WebApi/obj
 /OthersAPI/bin/Debug/net5.0
 /OthersAPI/obj
+/OthersAPI.Tests/bin/Debug/net5.0
+/OthersAPI.Tests/obj

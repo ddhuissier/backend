@@ -37,9 +37,14 @@ namespace OthersAPI.Controllers
 
         // GET api/<WeatherPreferencesController>/5
         [HttpGet("{id}")]
-        public WeatherPreference Get(Guid id) 
+        public ActionResult<WeatherPreference> Get(Guid id) 
         {
-            return repo.Get(id);
+            var item = repo.Get(id);
+            if(item == null)
+            {
+                return NotFound();
+            }
+            return item;
         }
 
         // POST api/<WeatherPreferencesController>
