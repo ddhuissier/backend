@@ -38,9 +38,7 @@ namespace WebApi
                .AddJwtBearer("Bearer", config =>
                {
                    config.Authority = "http://localhost:5000/";
-
                    config.Audience = "WebApi";
-
                    config.RequireHttpsMetadata = false;
                });
 
@@ -50,9 +48,11 @@ namespace WebApi
                         .AllowAnyMethod()
                         .AllowAnyHeader()));
 
-            services.AddScoped<IStoreRepository, StoreRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetValue<string>("SqlBD:ConnectionString")));
+            services.AddBusinessServices();
+
+            services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(configuration.GetValue<string>("SqlBD:ConnectionString"))
+                    );
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

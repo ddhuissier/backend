@@ -1,16 +1,14 @@
 ﻿using WebApi.Models;
 using WebApi.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Contract.V1;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -21,30 +19,29 @@ namespace WebApi.Controllers
             _productRepository = productRepository;
         }
 
-        [HttpGet]
-        //[Authorize]
+        [HttpGet(ApiRoutes.Products.GetProducts)]
         public async Task<IEnumerable<Product>> GetProducts()
         {
             return await _productRepository.Get();
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProducts(int id)
+        [HttpGet(ApiRoutes.Products.GetProduct)]
+        public async Task<ActionResult<Product>> GetProduct([FromRoute] int id)
         {
             return await _productRepository.Get(id);
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<ActionResult<Product>>PostProducts([FromBody] Product product)
+        [HttpPost(ApiRoutes.Products.PostProduct)]
+       // [Authorize]
+        public async Task<ActionResult<Product>>PostProduct([FromBody] Product product)
         {
             var newProduct = await _productRepository.Create(product);
             return CreatedAtAction(nameof(GetProducts), new { id = newProduct.Id }, newProduct);
         }
 
-        [HttpPut]
-        [Authorize]
-        public async Task<ActionResult> PutProducts(int id, [FromBody] Product product)
+        [HttpPut(ApiRoutes.Products.PutProduct)]
+       // [Authorize]
+        public async Task<ActionResult> PutProduct([FromRoute] int id, [FromBody] Product product)
         {
             if(id != product.Id)
             {
@@ -56,9 +53,9 @@ namespace WebApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
-        public async Task<ActionResult> Delete (int id)
+        [HttpDelete(ApiRoutes.Products.DeleteProduct)]
+       // [Authorize]
+        public async Task<ActionResult> DeleteProduct(int id)
         {
             var productToDelete = await _productRepository.Get(id);
             if (productToDelete == null)

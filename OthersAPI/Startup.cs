@@ -49,7 +49,7 @@ namespace OthersAPI
                   config.RequireHttpsMetadata = false;
               });
             services.AddCors(confg =>
-               confg.AddPolicy("JustGet",
+               confg.AddPolicy("OpenBar",
                    p => p.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader()));
@@ -82,7 +82,7 @@ namespace OthersAPI
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OthersAPI v1"));
             }
 
-            app.UseCors("JustGet");
+            app.UseCors("OpenBar");
             if (env.IsDevelopment())
             {
                 app.UseHttpsRedirection();

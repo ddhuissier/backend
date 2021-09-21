@@ -29,7 +29,7 @@ namespace OthersAPI.Tests
             controller = new ProductsController(_repositoryStub.Object);
 
             // Act
-            var result = await controller.PostProducts(product);
+            var result = await controller.PostProduct(product);
 
             // Asserts
             var resultItem = (result.Result as CreatedAtActionResult).Value as Product;

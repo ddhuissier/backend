@@ -8,3 +8,5 @@
 /OthersAPI/obj
 /OthersAPI.Tests/bin/Debug/net5.0
 /OthersAPI.Tests/obj
+/WebApi.IntegrationTests/bin/Debug/net5.0
+/WebApi.IntegrationTests/obj
