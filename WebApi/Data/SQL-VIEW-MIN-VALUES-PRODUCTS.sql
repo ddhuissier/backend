@@ -1,6 +1,6 @@
 CREATE VIEW v_Products_min_values
 AS
-SELECT Id, Name, Price FROM PRODUCTS
+SELECT  Name, Price FROM PRODUCTS
 GO
 
 -- SELECT * FROM v_Products_min_values

@@ -1,10 +1,14 @@
-CREATE PROC spGetProduct
+IF OBJECT_ID('spGetProductById', 'P') IS NOT NULL
+DROP PROC spGetProductById
+GO
+CREATE PROC spGetProductById
 (
 		@ID INT
 )
 AS
 BEGIN
-  SELECT * FROM PRODUCTS 
-  WHERE Id = @ID
+	SET NOCOUNT ON;
+	SELECT Name, Price FROM PRODUCTS 
+	WHERE Id = @ID
 
 END
