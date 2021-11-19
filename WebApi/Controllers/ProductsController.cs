@@ -20,6 +20,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet(ApiRoutes.Products.GetProducts)]
+        [Authorize]
         public async Task<IEnumerable<Product>> GetProducts()
         {
             return await _productRepository.Get();
@@ -32,7 +33,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost(ApiRoutes.Products.PostProduct)]
-       // [Authorize]
+        [Authorize]
         public async Task<ActionResult<Product>>PostProduct([FromBody] Product product)
         {
             var newProduct = await _productRepository.Create(product);
@@ -40,7 +41,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut(ApiRoutes.Products.PutProduct)]
-       // [Authorize]
+        [Authorize]
         public async Task<ActionResult> PutProduct([FromRoute] int id, [FromBody] Product product)
         {
             if(id != product.Id)
@@ -54,7 +55,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete(ApiRoutes.Products.DeleteProduct)]
-       // [Authorize]
+        [Authorize]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             var productToDelete = await _productRepository.Get(id);
